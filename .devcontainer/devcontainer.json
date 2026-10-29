@@ -1,0 +1,28 @@
+{
+    "name": "Python 3 - Zoomcamp - Orange Diseases Prediction",
+    "image": "mcr.microsoft.com/devcontainers/python:3.14-trixie",
+    "runArgs": [
+        "--name", "orange_diseases_prediction"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-toolsai.jupyter",
+                "ms-python.vscode-pylance",
+                "ms-toolsai.jupyter-keymap",
+                "ms-toolsai.jupyter-renderers",
+                "esbenp.prettier-vscode",
+                "supermaven.supermaven"
+            ],
+            "settings": {
+                "python.languageServer": "Pylance",
+                "python.formatting.provider": "black",
+                "python.linting.enabled": true,
+                "python.linting.pylintEnabled": true,
+                "jupyter.sendSelectionToInteractiveWindow": true
+            }
+        }
+    },
+    "remoteUser": "vscode"
+}
