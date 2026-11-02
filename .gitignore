@@ -33,3 +33,8 @@ ipynb_checkpoints/
 # IDE-specific settings (VS Code)
 vscode/
 *.code-workspace
+
+# Custom
+data/
+data_reduced/
+results/
