@@ -165,11 +165,50 @@ folding), radically reducing inference latency on standard CPU instances.
 
 ### Project folder structure
 
+ TODOOOOOOO
+
 ### Architecture diagram
+
+ TODOOOOOOO
 
 ## How to run
 
 ### How to run locally
+
+- Requirements. Make sure you have the following installed:
+    - Python >=3.14
+    - pip >=26.2
+
+- Clone the repository from GitHub:
+```bash
+git clone https://github.com/maneldevs/orange_diseases_prediction.git
+```
+
+- Create a virtual environment:
+```bash
+python -m venv .venv
+```
+
+- Activate the virtual environment:
+```bash
+source .venv/bin/activate
+```
+
+- Install dependencies:
+```bash
+pip install -r requirements.txt
+```S
+
+- Be sure you are in the root directory of the project
+
+- Run the training script:
+```bash
+python scripts/train.py
+# Optionally, you can specify the train folder data and model paths:
+# python scripts/train.py --train data_reduced/train --modelpth models/orange_diseases_model_1.pth --models/orange_diseases_model_1.onnx
+```
+
+ TODOOOOOOO
 
 ### How to run using Docker
 
