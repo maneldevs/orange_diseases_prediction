@@ -148,6 +148,7 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 pip install fastapi uvicorn
 pip install matplotlib
 pip install onnx onnxscript
+pip install onnxruntime
 ```
 
 ### Model Format
@@ -206,6 +207,25 @@ pip install -r requirements.txt
 python scripts/train.py
 # Optionally, you can specify the train folder data and model paths:
 # python scripts/train.py --train data_reduced/train --modelpth models/orange_diseases_model_1.pth --models/orange_diseases_model_1.onnx
+```
+
+- Run the prediction script:
+```bash
+python scripts/predict.py
+# Optionally, you can specify the model path:
+# python scripts/predict.py --image examples/example_blakspot.png --model models/orange_diseases_model_1.onnx
+```
+
+- The results will be printed to the console:
+```
+ Results for the image: examples/example_blakspot.png
+--------------------------------------------------
+  blackspot: 71.00%
+  canker: 27.93%
+  grenning: 0.07%
+  healthy: 1.00%
+--------------------------------------------------
+Prediction: **blackspot** (71.00%)
 ```
 
  TODOOOOOOO
