@@ -23,10 +23,10 @@ By deploying this lightweight computer vision system, farmers can:
 
 | Disease / Condition | Class Name | Train Images | Test Images | File Format |
 | :--- | :--- | :---: | :---: | :---: |
-| **Healthy Orange** | `fresh_orange` | 281 | 33 | `.png`|
-| **Citrus Canker** | `cankered_orange` | 179 | 22 | `.jpg`|
-| **Black Spot** | `blackspotted_orange` | 184 | 22 | `.jpg`|
-| **Citrus Greening (HLB)** | `greening_orange` | 347 | 22 | `.jpg`|
+| **Healthy Orange** | `fresh` | 281 | 33 | `.png`|
+| **Citrus Canker** | `cankered` | 179 | 22 | `.jpg`|
+| **Black Spot** | `blackspot` | 184 | 22 | `.jpg`|
+| **Citrus Greening (HLB)** | `grenning` | 347 | 22 | `.jpg`|
 
 - Images representing infected oranges maintain a uniform resolution of 800×800 pixels, whereas images of healthy oranges feature variable dimensions.
 
@@ -168,11 +168,52 @@ folding), radically reducing inference latency on standard CPU instances.
 
 ### Project folder structure
 
- TODOOOOOOO
+![alt text](image.png)
+
+- devcontainer: Contains the configuration files for the development environment.
+- data: Contains the raw data with orange images.
+- data_reduced: Contains the raw data with orange images to train models.
+- examples: Contains images to test the application.
+- models: Contains the trained models in onnx and pth format.
+- notebooks: Contains Jupyter notebooks for data exploration and analysis.
+- results: Contains pth files of checkpointers.
+- scripts: Contains the Python scripts for training, testing, and serving the web service.
+  - train.py: Contains the main logic for training the model and saving it to disk.
+  - predict.py: Contains the main logic for making predictions.
+  - serve.py: Contains the FastAPI server for serving the web service.
+- templates: Contains the HTML templates for the web service.
+- Dockerfile: Specifies the Docker configuration for the web service.
+- requirements.txt: Lists the required Python packages for the project.
+- README.md: Provides an overview of the project and instructions for running it.
 
 ### Architecture diagram
 
- TODOOOOOOO
+```mermaid
+graph TD
+    subgraph DevEnvironment [Development Environment - WSL: Ubuntu]
+        A[data_reduced] -->|1. Train Script| B(train.py)
+        B -->|2. Save| C[model.onnx]
+    end
+
+    subgraph Deployment [Deployment Artifacts]
+        C -->|Git Push| D[Repository]
+        E[index.html] -->|Git Push| D
+    end
+
+    subgraph Production [Production Environment - Render Cloud]
+        D -->|Docker Build| F[Render Web Service]
+        F -->|3. Entry Point| G(serve.py)
+        G -->|4. Import & Load| H(predict.py)
+        C -.->|Read Binary| H
+        E -.->|Render View| G
+        
+        I[User] -->|HTTP POST| G
+        G -->|Input Data| H
+        H -->|Return Grade| G
+        G -->|HTML Response| I
+    end
+
+```
 
 ## How to run
 
@@ -231,7 +272,7 @@ python scripts/predict.py
 Prediction: **blackspot** (71.00%)
 ```
 
-#### Run de Web service
+#### Run the Web service
 
 - Start the Web Service:
 ```bash
@@ -282,7 +323,7 @@ http://localhost:7860
 
 - Stop and delete the Docker container:
 ```bash
-Pulse the Ctrl+C key
+Press the Ctrl+C key
 ```
 
 ### How to run on the Cloud
@@ -297,3 +338,11 @@ https://orange-diseases-prediction.onrender.com/
 <img src="images/image-6.png" alt="screenshot_web" width="300"/>
 
 ## Known limitations and next steps
+
+As main limitation, to ensure strict uniform class balancing, the operational dataset was downsampled to 179 images per category. While this completely neutralized model bias during training, it limits structural variety and could impact generalization when faced with highly chaotic or real-world unconstrained outdoor agricultural lighting backgrounds.
+
+Next steps:
+
+* **Upgrade to a Larger Architecture:** Transition from the lightweight MobileNetV2 backbone to a more expressive and larger deep learning architecture (such as EfficientNet-B0/B3 or a Vision Transformer variant) to enhance complex geometric pattern recognition and boost overall classification accuracy.
+
+* **Incorporate a Comprehensive Real-World Dataset:** Expand the operational training pipeline by collecting a larger, unconstrained multi-source dataset that includes field-captured photographs under diverse ambient lighting conditions, varying angles, and complex agricultural backgrounds to ensure high robustness in real-world deployments.
