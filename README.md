@@ -200,18 +200,19 @@ source .venv/bin/activate
 - Install dependencies:
 ```bash
 pip install -r requirements.txt
-```S
+```
 
 - Be sure you are in the root directory of the project
 
-- Run the training script:
+#### Run the training script:
+
 ```bash
 python scripts/train.py
 # Optionally, you can specify the train folder data and model paths:
 # python scripts/train.py --train data_reduced/train --modelpth models/orange_diseases_model_1.pth --models/orange_diseases_model_1.onnx
 ```
 
-- Run the prediction script:
+#### Run the prediction script:
 ```bash
 python scripts/predict.py
 # Optionally, you can specify the model path:
@@ -230,6 +231,8 @@ python scripts/predict.py
 Prediction: **blackspot** (71.00%)
 ```
 
+#### Run de Web service
+
 - Start the Web Service:
 ```bash
 python scripts/serve.py
@@ -240,10 +243,48 @@ python scripts/serve.py
 http://localhost:7860
 ```
 ![alt text](image.png)
+
 ![alt text](image-1.png)
+
 ![alt text](image-2.png)
 
+- Deactivate the virtual environment:
+```bash
+deactivate
+```
+
 ### How to run using Docker
+
+- Requirements. Make sure you have the following installed:
+    - Docker
+
+- Clone the repository from GitHub:
+```bash
+git clone https://github.com/maneldevs/orange_diseases_prediction.git
+```
+
+- Be sure you are in the root directory of the project
+
+- Build the Docker image:
+```bash
+docker build -t orange_diseases_prediction .
+# this process can take several minutes
+```
+
+- Run the Docker container:
+```bash
+docker run --rm -p 7860:7860 orange_diseases_prediction
+```
+
+- Open the Web Service in your browser:
+```bash
+http://localhost:7860
+```
+
+- Stop and delete the Docker container:
+```bash
+Pulse the Ctrl+C key
+```
 
 ### How to run on the Cloud
 
