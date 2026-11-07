@@ -242,11 +242,10 @@ python scripts/serve.py
 ```bash
 http://localhost:7860
 ```
-![alt text](images/image-4.png)
 
-![alt text](images/image-5.png)
-
-![alt text](images/image-6.png)
+<img src="images/image-4.png" alt="screenshot_web" width="300"/>
+<img src="images/image-5.png" alt="screenshot_web" width="300"/>
+<img src="images/image-6.png" alt="screenshot_web" width="300"/>
 
 - Deactivate the virtual environment:
 ```bash
@@ -287,5 +286,14 @@ Pulse the Ctrl+C key
 ```
 
 ### How to run on the Cloud
+
+- Open the Web Service in your browser:
+```bash
+https://orange-diseases-prediction.onrender.com/
+```
+
+<img src="images/image-4.png" alt="screenshot_web" width="300"/>
+<img src="images/image-5.png" alt="screenshot_web" width="300"/>
+<img src="images/image-6.png" alt="screenshot_web" width="300"/>
 
 ## Known limitations and next steps
