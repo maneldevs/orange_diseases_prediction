@@ -144,11 +144,13 @@ The checkpoint selected for final deployment is **`../results/v0.01-10-0.02-aug_
 ### Dependencies
 
 ```bash
+pip install numpy
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 pip install fastapi uvicorn
 pip install matplotlib
 pip install onnx onnxscript
 pip install onnxruntime
+pip install python-multipart
 ```
 
 ### Model Format
@@ -228,7 +230,18 @@ python scripts/predict.py
 Prediction: **blackspot** (71.00%)
 ```
 
- TODOOOOOOO
+- Start the Web Service:
+```bash
+python scripts/serve.py
+```
+
+- Open the Web Service in your browser:
+```bash
+http://localhost:7860
+```
+![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-2.png)
 
 ### How to run using Docker
 

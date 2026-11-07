@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Orange diseases predictor</title>
+  <style>
+    :root {
+      --fondo: #E7ECE9;
+      --papel: #F7F9F8;
+      --tinta: #17302A;
+      --suave: #5A6E68;
+      --acento: #2F7A5B;
+      --error: #A8321E;
+      --borde: #C9D4CF;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --fondo: #121A18;
+        --papel: #1A2522;
+        --tinta: #E4ECE8;
+        --suave: #9AAEA7;
+        --acento: #6CC39C;
+        --error: #F08A72;
+        --borde: #2E3D39;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--fondo);
+      color: var(--tinta);
+      font-family: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 1rem;
+      line-height: 1.5;
+      display: grid;
+      place-items: start center;
+      padding: 3rem 1.25rem;
+    }
+    main { width: 100%; max-width: 34rem; }
+    h1 { font-size: 1.75rem; font-weight: 800; margin: 0 0 .25rem; letter-spacing: -0.01em; }
+    .intro { color: var(--suave); margin: 0 0 2rem; }
+
+    form {
+      background: var(--papel);
+      border: 1px solid var(--borde);
+      border-radius: 14px;
+      padding: 1.5rem;
+    }
+    .zona {
+      display: block;
+      border: 2px dashed var(--borde);
+      border-radius: 10px;
+      padding: 1.75rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      color: var(--suave);
+    }
+    .zona:hover, .zona:focus-within { border-color: var(--acento); color: var(--tinta); }
+    .zona strong { color: var(--tinta); }
+    .zona input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    #nombre-archivo { display: block; margin-top: .5rem; font-weight: 600; color: var(--tinta); word-break: break-all; }
+
+    /* NUEVO: Contenedor para previsualizar antes de enviar */
+    .previsualizacion-local {
+      margin-top: 1rem;
+      width: 100%;
+      max-height: 12rem;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px dashed var(--borde);
+      display: none; /* Se activa por JS */
+    }
+
+    button {
+      margin-top: 1rem;
+      width: 100%;
+      padding: .85rem 1rem;
+      border: 0;
+      border-radius: 10px;
+      background: var(--acento);
+      color: var(--papel);
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .55; cursor: progress; }
+    button:focus-visible, .zona:focus-within { outline: 3px solid var(--acento); outline-offset: 3px; }
+
+    .error {
+      margin-top: 1.25rem;
+      padding: .85rem 1rem;
+      border-left: 4px solid var(--error);
+      background: var(--papel);
+      color: var(--error);
+      border-radius: 0 8px 8px 0;
+    }
+
+    .resultado {
+      margin-top: 2rem;
+      display: grid;
+      gap: 1.25rem;
+    }
+    .resultado img {
+      width: 100%;
+      max-height: 20rem;
+      object-fit: contain;
+      border-radius: 10px;
+      background: var(--papel);
+      border: 1px solid var(--borde);
+    }
+    .estimacion { color: var(--suave); margin: 1rem 0 0; font-weight: 600; }
+    .palabra {
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: var(--acento);
+      margin: .25rem 0 0;
+      word-break: break-word;
+    }
+    /* Lista estilizada para los porcentajes */
+    .lista-probabilidades {
+      list-style: none;
+      padding: 0;
+      margin: 0.5rem 0 0;
+    }
+    .lista-probabilidades li {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.25rem 0;
+      border-bottom: 1px solid var(--borde);
+      color: var(--tinta);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Orange disease predictor</h1>
+    <p class="intro">Upload an orange image to predict if it has a disease</p>
+
+    <form action="/predict" method="post" enctype="multipart/form-data" id="formulario">
+      <label class="zona">
+        <strong>Choose an image</strong> or drag here<br>
+        <small>JPG or PNG</small>
+        <input type="file" name="file" id="archivo" accept="image/jpeg,image/png,image/webp" required>
+        <span id="nombre-archivo"></span>
+      </label>
+      <!-- Elemento img para la previsualización local antes de enviar -->
+      <img id="vista-previa-local" class="previsualizacion-local" src="#" alt="Previsualización">
+      {% if prediction %}
+        <!-- Si ya hay resultado, mostramos el botón de reinicio que redirige a / -->
+        <a href="/" style="display: block; text-align: center; text-decoration: none;" class="palabra">
+          <button type="button" style="background: var(--tinta);">New Prediction</button>
+        </a>
+      {% else %}
+        <!-- Si no hay predicción, mostramos el botón normal de análisis -->
+        <button type="submit" id="boton">Analyze</button>
+      {% endif %}
+    </form>
+
+    <div class="error" id="error" {% if not error %}hidden{% endif %}>{{ error or "" }}</div>
+
+    {% if prediction %}
+    <section class="resultado" aria-live="polite">
+      <!-- Muestra la imagen procesada devuelta por el servidor -->
+      <img src="{{ preview }}" alt="Uploaded Image">
+      <div>
+        <p class="estimacion">Final Prediction</p>
+        <p class="palabra" style="font-size: 1.5rem;">{{ prediction.prediction_class }}</p>
+        
+        <p class="estimacion">Probabilities</p>
+        <ul class="lista-probabilidades">
+          {% for clase, porcentaje in prediction.prediction_result.items() %}
+            <li>
+              <span>{{ clase | capitalize }}</span>
+              <strong>{{ porcentaje }}%</strong>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+    {% endif %}
+  </main>
+
+  <!-- NUEVO: Lógica JavaScript para control visual inmediato -->
+  <script>
+    const inputArchivo = document.getElementById('archivo');
+    const labelNombre = document.getElementById('nombre-archivo');
+    const imgLocal = document.getElementById('vista-previa-local');
+    const formulario = document.getElementById('formulario');
+    const boton = document.getElementById('boton');
+    // Capturamos el contenedor del área de arrastre
+    const zonaDrop = document.querySelector('.zona');
+
+    // Función reutilizable para procesar el archivo seleccionado
+    function procesarArchivo(file) {
+      if (file && file.type.startsWith('image/')) {
+        // 1. Mostrar el nombre del archivo
+        labelNombre.textContent = file.name;
+        
+        // 2. Generar la previsualización local instantánea
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          imgLocal.src = event.target.result;
+          imgLocal.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // --- EVENTOS DE CLICK Y SELECCIÓN ESTÁNDAR ---
+    inputArchivo.addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        procesarArchivo(e.target.files[0]);
+      }
+    });
+
+    // --- NUEVO: EVENTOS PARA SOPORTAR DRAG & DROP ---
+    
+    // Previene que el navegador abra la imagen al arrastrarla encima
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(nombreEvento => {
+      zonaDrop.addEventListener(nombreEvento, (e) => e.preventDefault(), false);
+    });
+
+    // Cambios visuales opcionales cuando el archivo flota sobre la zona
+    ['dragenter', 'dragover'].forEach(nombreEvento => {
+      zonaDrop.addEventListener(nombreEvento, () => {
+        zonaDrop.style.borderColor = 'var(--acento)';
+        zonaDrop.style.color = 'var(--tinta)';
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(nombreEvento => {
+      zonaDrop.addEventListener(nombreEvento, () => {
+        zonaDrop.style.borderColor = 'var(--borde)';
+        zonaDrop.style.color = 'var(--suave)';
+      }, false);
+    });
+
+    // Captura el archivo cuando es soltado en la caja
+    zonaDrop.addEventListener('drop', (e) => {
+      const datosTransferidos = e.dataTransfer;
+      const archivos = datosTransferidos.files;
+
+      if (archivos && archivos[0]) {
+        // ASIGNACIÓN CLAVE: Inyectamos el archivo arrastrado directamente en el input HTML
+        inputArchivo.files = archivos;
+        // Lanzamos el procesamiento visual del archivo
+        procesarArchivo(archivos[0]);
+      }
+    }, false);
+
+    // Estado del botón al enviar el formulario
+    formulario.addEventListener('submit', function() {
+      boton.disabled = true;
+      boton.textContent = 'Analyzing...';
+    });
+  </script>
+
+</body>
+</html>
